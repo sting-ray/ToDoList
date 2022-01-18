@@ -39,5 +39,4 @@ function newElement() {
     li.appendChild(span);
 
     span.addEventListener("click", removeTask);
-
 }
