@@ -1,3 +1,14 @@
+class Item {
+    text: string;
+    timer = 0;
+    timerOn = false;
+
+    constructor(text: string) {
+        this.text = text;
+
+    }
+}
+
 const list = document.querySelector("ul") as HTMLElement;
 list.addEventListener("click", itemClick);
 
@@ -16,6 +27,16 @@ function removeTask(this: HTMLElement, event: Event) {
     parent.style.display = "none";
 }
 
+function startTimer(this: HTMLElement, event: Event) {
+        const timerOn = setInterval(increaseTimer, 1000, this);
+}
+
+function increaseTimer(timer: HTMLElement) {
+    let number = parseInt(timer.innerText);
+    number++;
+    timer.innerText = number.toString();
+}
+
 
 // Create a new list item when clicking on the "Add" button
 function newElement() {
@@ -24,6 +45,13 @@ function newElement() {
     const myInput = document.getElementById("myInput") as HTMLInputElement;
     const inputValue = myInput.value;
     const t = document.createTextNode(inputValue);
+
+    const timer = document.createElement("span");
+    const timerText = document.createTextNode("0");
+    timer.appendChild(timerText);
+    li.appendChild(timer);
+    timer.addEventListener("click", startTimer);
+
     li.appendChild(t);
     if (inputValue === '') {
         alert("You must write something!");
