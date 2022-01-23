@@ -1,19 +1,97 @@
 class Item {
     text: string;
-    timer = 0;
+    totalSeconds = 0;
     timerOn = false;
+    timerElement: HTMLElement;
 
     constructor(text: string) {
         this.text = text;
 
+        const listItem = document.createElement("li");
+
+        const timer = document.createElement("span");
+        const timerText = document.createTextNode("00.00");
+        timer.className = "timer";
+        timer.appendChild(timerText);
+        listItem.appendChild(timer);
+        timer.addEventListener("click", this.timerSwitch.bind(this));
+        this.timerElement = timer;
+
+        const textNode = document.createTextNode(text);
+        listItem.appendChild(textNode);
+
+        const closeItem = document.createElement("span");
+        const closeItemText = document.createTextNode("\u00D7");
+        closeItem.className = "close";
+        closeItem.appendChild(closeItemText);
+        listItem.append(closeItem);
+        closeItem.addEventListener("click", this.removeItem);
+
+        const list = document.getElementById("myUL") as HTMLElement;
+        list.appendChild(listItem);
+    }
+
+    timerSwitch() {
+        this.timerOn = !this.timerOn;
+        if (this.timerOn) {
+            this.timerElement.className = "timerActive";
+        }
+        else {
+            this.timerElement.className = "timer";
+        }
+    }
+
+    //TODO: timer only increases if browser is active, may need to look at re-writing this to work from date/time instead
+    increaseTimer() {
+        this.totalSeconds++;
+        const hours = Math.trunc(this.totalSeconds / 3600);
+        const remainder = this.totalSeconds % 3600;
+        const minutes = this.numberPadding(Math.trunc(remainder / 60));
+        const seconds = this.numberPadding(remainder % 60);
+        let finalText = '';
+        if (hours == 0) {
+            finalText = minutes + '.' + seconds;
+        }
+        else {
+            finalText = hours + ':' + minutes;
+        }
+
+        this.timerElement.innerText = finalText;
+    }
+
+    numberPadding(number: number): string {
+        let string = number.toString()
+        if (string.length == 1) {
+            string = '0' + string;
+        }
+        else if (string == '0') {
+            string = '00';
+        }
+        return string;
+    }
+
+
+    //TODO improve (still same task from the original tutorial)
+    removeItem(this: HTMLElement, event: Event) {
+        const parent = this.parentElement as HTMLElement;
+        parent.style.display = "none";
     }
 }
 
-const list = document.querySelector("ul") as HTMLElement;
-list.addEventListener("click", itemClick);
+const items: Item[] = [];
+
+function newItem(this: HTMLElement, event: Event) {
+    const inputTextObject = document.getElementById("myInput") as HTMLInputElement;
+    const inputText = inputTextObject.value;
+    items.push(new Item(inputText));
+}
 
 const addButton = document.getElementById("addBtn") as HTMLElement;
-addButton.addEventListener("click", newElement);
+addButton.addEventListener("click", newItem);
+
+//TODO put into class
+const list = document.querySelector("ul") as HTMLElement;
+list.addEventListener("click", itemClick);
 
 function itemClick(this: HTMLElement, event: Event) {
     if (event.target) {
@@ -22,49 +100,13 @@ function itemClick(this: HTMLElement, event: Event) {
     }
 }
 
-function removeTask(this: HTMLElement, event: Event) {
-    const parent = this.parentElement as HTMLElement;
-    parent.style.display = "none";
-}
 
-function startTimer(this: HTMLElement, event: Event) {
-        const timerOn = setInterval(increaseTimer, 1000, this);
-}
+const timer = setInterval(everySecond, 1000);
 
-function increaseTimer(timer: HTMLElement) {
-    let number = parseInt(timer.innerText);
-    number++;
-    timer.innerText = number.toString();
-}
-
-
-// Create a new list item when clicking on the "Add" button
-function newElement() {
-    const li = document.createElement("li") as HTMLElement;
-    const myUL = document.getElementById("myUL") as HTMLElement;
-    const myInput = document.getElementById("myInput") as HTMLInputElement;
-    const inputValue = myInput.value;
-    const t = document.createTextNode(inputValue);
-
-    const timer = document.createElement("span");
-    const timerText = document.createTextNode("0");
-    timer.appendChild(timerText);
-    li.appendChild(timer);
-    timer.addEventListener("click", startTimer);
-
-    li.appendChild(t);
-    if (inputValue === '') {
-        alert("You must write something!");
-    } else {
-        myUL.appendChild(li);
+function everySecond() {
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].timerOn) {
+            items[i].increaseTimer();
+        }
     }
-    myInput.value = "";
-
-    const span = document.createElement("SPAN");
-    const txt = document.createTextNode("\u00D7");
-    span.className = "close";
-    span.appendChild(txt);
-    li.appendChild(span);
-
-    span.addEventListener("click", removeTask);
 }
