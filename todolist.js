@@ -69,6 +69,7 @@ function newItem(event) {
     const inputTextObject = document.getElementById("myInput");
     const inputText = inputTextObject.value;
     items.push(new Item(inputText));
+    inputTextObject.value = "";
 }
 const addButton = document.getElementById("addBtn");
 addButton.addEventListener("click", newItem);

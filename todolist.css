@@ -62,7 +62,7 @@ ul li.checked::before {
     width: 7px;
 }
 
-/*Timer - code from: */
+/*Timer - code from: https://www.bestcssbuttongenerator.com/*/
 .timer {
     box-shadow:inset 0px 1px 0px 0px #bee2f9;
     background:linear-gradient(to bottom, #63b8ee 5%, #468ccf 100%);
